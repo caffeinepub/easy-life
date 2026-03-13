@@ -5,6 +5,7 @@ import { ShoppingCart, Star } from "lucide-react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
 import { useCart } from "../context/CartContext";
+import { useCurrency } from "../context/CurrencyContext";
 import type { Product } from "../data/products";
 
 interface ProductCardProps {
@@ -14,12 +15,13 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
   const navigate = useNavigate();
+  const { format } = useCurrency();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     addToCart(product);
     toast.success(`${product.name} added to cart!`, {
-      description: `$${product.price.toFixed(2)}`,
+      description: format(product.price),
     });
   };
 
@@ -72,7 +74,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
         <div className="flex items-center justify-between">
           <span className="font-semibold text-lg text-foreground">
-            ${product.price.toFixed(2)}
+            {format(product.price)}
           </span>
           <Button
             size="sm"

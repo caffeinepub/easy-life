@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -28,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import {
   Table,
   TableBody,
@@ -44,6 +46,7 @@ import {
   Loader2,
   Package,
   Plus,
+  Settings,
   ShoppingBag,
   Trash2,
   TrendingUp,
@@ -51,6 +54,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { type Currency, useCurrency } from "../context/CurrencyContext";
 import { CATEGORIES, type Category } from "../data/products";
 import { useActor } from "../hooks/useActor";
 
@@ -121,6 +125,7 @@ const CHUNK_SIZE = 1024 * 1024; // 1MB
 
 export default function AdminPage() {
   const { actor, isFetching } = useActor();
+  const { format, currency, setCurrency } = useCurrency();
   const [products, setProducts] = useState<BackendProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -380,7 +385,7 @@ export default function AdminPage() {
           />
         </div>
         <div>
-          <Label>Price ($) *</Label>
+          <Label>Price (USD) *</Label>
           <Input
             type="number"
             step="0.01"
@@ -464,7 +469,7 @@ export default function AdminPage() {
           {
             icon: TrendingUp,
             label: "Revenue",
-            value: `$${totalRevenue.toFixed(2)}`,
+            value: format(totalRevenue),
             color: "text-emerald-600",
           },
         ].map(({ icon: Icon, label, value, color }) => (
@@ -489,6 +494,10 @@ export default function AdminPage() {
           </TabsTrigger>
           <TabsTrigger value="orders" data-ocid="admin.orders.tab">
             Orders
+          </TabsTrigger>
+          <TabsTrigger value="settings" data-ocid="admin.settings.tab">
+            <Settings className="h-3.5 w-3.5 mr-1.5" />
+            Settings
           </TabsTrigger>
         </TabsList>
 
@@ -592,7 +601,7 @@ export default function AdminPage() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right font-medium">
-                        ${(Number(product.priceInCents) / 100).toFixed(2)}
+                        {format(Number(product.priceInCents) / 100)}
                       </TableCell>
                       <TableCell className="text-right">
                         <span
@@ -661,7 +670,7 @@ export default function AdminPage() {
                     </TableCell>
                     <TableCell>{order.items}</TableCell>
                     <TableCell className="text-right font-semibold">
-                      ${order.total.toFixed(2)}
+                      {format(order.total)}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -682,6 +691,96 @@ export default function AdminPage() {
               </TableBody>
             </Table>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="settings">
+          <div className="max-w-lg">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base font-display">
+                  Store Settings
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <h3 className="text-sm font-semibold mb-1">
+                    Display Currency
+                  </h3>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Prices are stored in USD and converted for display. Changes
+                    apply instantly across the entire store.
+                  </p>
+                  <RadioGroup
+                    value={currency}
+                    onValueChange={(v) => {
+                      setCurrency(v as Currency);
+                      toast.success(
+                        `Currency changed to ${v === "INR" ? "INR (₹)" : "USD ($)"}`,
+                      );
+                    }}
+                    data-ocid="admin.currency.select"
+                    className="space-y-3"
+                  >
+                    <div className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors cursor-pointer">
+                      <RadioGroupItem
+                        value="INR"
+                        id="currency-inr"
+                        data-ocid="admin.currency.radio"
+                      />
+                      <Label
+                        htmlFor="currency-inr"
+                        className="cursor-pointer flex-1"
+                      >
+                        <span className="font-medium">
+                          INR (₹) — Indian Rupee
+                        </span>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Display prices in Indian Rupees
+                        </p>
+                      </Label>
+                      <span className="text-lg font-semibold text-muted-foreground">
+                        ₹
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 transition-colors cursor-pointer">
+                      <RadioGroupItem
+                        value="USD"
+                        id="currency-usd"
+                        data-ocid="admin.currency.radio"
+                      />
+                      <Label
+                        htmlFor="currency-usd"
+                        className="cursor-pointer flex-1"
+                      >
+                        <span className="font-medium">USD ($) — US Dollar</span>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Display prices in US Dollars
+                        </p>
+                      </Label>
+                      <span className="text-lg font-semibold text-muted-foreground">
+                        $
+                      </span>
+                    </div>
+                  </RadioGroup>
+                </div>
+
+                <Separator />
+
+                <div className="p-3 rounded-lg bg-secondary/50 text-xs text-muted-foreground">
+                  <p className="font-medium text-foreground mb-1">
+                    ℹ️ How currency works
+                  </p>
+                  <p>
+                    All product prices are entered and stored in{" "}
+                    <strong>USD</strong>. When INR is selected, prices are
+                    converted using an approximate exchange rate (1 USD ≈ ₹83).
+                    The setting is saved in your browser and applies to all
+                    pages including cart and checkout.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
 

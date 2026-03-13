@@ -10,6 +10,7 @@ import CartDrawer from "./components/CartDrawer";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import { CartProvider } from "./context/CartContext";
+import { CurrencyProvider } from "./context/CurrencyContext";
 import AboutPage from "./pages/AboutPage";
 import AccountPage from "./pages/AccountPage";
 import AdminPage from "./pages/AdminPage";
@@ -24,17 +25,19 @@ import RefundPolicyPage from "./pages/RefundPolicyPage";
 
 function RootLayout() {
   return (
-    <CartProvider>
-      <div className="min-h-screen flex flex-col bg-background">
-        <Header />
-        <CartDrawer />
-        <div className="flex-1">
-          <Outlet />
+    <CurrencyProvider>
+      <CartProvider>
+        <div className="min-h-screen flex flex-col bg-background">
+          <Header />
+          <CartDrawer />
+          <div className="flex-1">
+            <Outlet />
+          </div>
+          <Footer />
         </div>
-        <Footer />
-      </div>
-      <Toaster richColors position="top-right" />
-    </CartProvider>
+        <Toaster richColors position="top-right" />
+      </CartProvider>
+    </CurrencyProvider>
   );
 }
 

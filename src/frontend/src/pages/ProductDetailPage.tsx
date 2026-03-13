@@ -10,6 +10,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import ProductCard from "../components/ProductCard";
 import { useCart } from "../context/CartContext";
+import { useCurrency } from "../context/CurrencyContext";
 import { PRODUCTS } from "../data/products";
 
 const STARS = [0, 1, 2, 3, 4];
@@ -18,6 +19,7 @@ export default function ProductDetailPage() {
   const { productId } = useParams({ strict: false });
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { format } = useCurrency();
   const [quantity, setQuantity] = useState(1);
 
   const product = PRODUCTS.find((p) => p.id === productId);
@@ -114,9 +116,7 @@ export default function ProductDetailPage() {
             </span>
           </div>
 
-          <p className="text-3xl font-semibold mb-6">
-            ${product.price.toFixed(2)}
-          </p>
+          <p className="text-3xl font-semibold mb-6">{format(product.price)}</p>
           <p className="text-muted-foreground leading-relaxed mb-8">
             {product.description}
           </p>
@@ -159,7 +159,7 @@ export default function ProductDetailPage() {
 
           <div className="flex gap-6 mt-6">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Package className="h-4 w-4" /> Free shipping over $50
+              <Package className="h-4 w-4" /> Free shipping over ₹4,000
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Shield className="h-4 w-4" /> 30-day returns

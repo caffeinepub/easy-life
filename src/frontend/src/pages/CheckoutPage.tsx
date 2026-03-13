@@ -9,10 +9,12 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useCart } from "../context/CartContext";
+import { useCurrency } from "../context/CurrencyContext";
 
 export default function CheckoutPage() {
   const { state, totalPrice, dispatch } = useCart();
   const navigate = useNavigate();
+  const { format } = useCurrency();
   const [isProcessing, setIsProcessing] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -127,19 +129,19 @@ export default function CheckoutPage() {
                       onChange={(e) =>
                         setForm({ ...form, city: e.target.value })
                       }
-                      placeholder="New York"
+                      placeholder="Mumbai"
                       className="mt-1"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="zip">ZIP Code</Label>
+                    <Label htmlFor="zip">PIN Code</Label>
                     <Input
                       id="zip"
                       value={form.zip}
                       onChange={(e) =>
                         setForm({ ...form, zip: e.target.value })
                       }
-                      placeholder="10001"
+                      placeholder="400001"
                       className="mt-1"
                     />
                   </div>
@@ -225,7 +227,7 @@ export default function CheckoutPage() {
                 </>
               ) : (
                 <>
-                  <Lock className="h-4 w-4" /> Pay ${total.toFixed(2)}
+                  <Lock className="h-4 w-4" /> Pay {format(total)}
                 </>
               )}
             </Button>
@@ -254,7 +256,7 @@ export default function CheckoutPage() {
                       Qty: {item.quantity}
                     </p>
                     <p className="text-sm font-semibold">
-                      ${(item.product.price * item.quantity).toFixed(2)}
+                      {format(item.product.price * item.quantity)}
                     </p>
                   </div>
                 </div>
@@ -263,7 +265,7 @@ export default function CheckoutPage() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between text-muted-foreground">
                   <span>Subtotal</span>
-                  <span>${totalPrice.toFixed(2)}</span>
+                  <span>{format(totalPrice)}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
                   <span>Shipping</span>
@@ -271,18 +273,18 @@ export default function CheckoutPage() {
                     {shipping === 0 ? (
                       <span className="text-primary font-medium">Free</span>
                     ) : (
-                      `$${shipping.toFixed(2)}`
+                      format(shipping)
                     )}
                   </span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
                   <span>Tax (8%)</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span>{format(tax)}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-semibold text-base">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>{format(total)}</span>
                 </div>
               </div>
             </CardContent>

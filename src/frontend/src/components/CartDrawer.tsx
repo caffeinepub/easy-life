@@ -5,10 +5,12 @@ import { useNavigate } from "@tanstack/react-router";
 import { Minus, Plus, ShoppingBag, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useCart } from "../context/CartContext";
+import { useCurrency } from "../context/CurrencyContext";
 
 export default function CartDrawer() {
   const { state, dispatch, totalItems, totalPrice } = useCart();
   const navigate = useNavigate();
+  const { format } = useCurrency();
 
   const handleCheckout = () => {
     dispatch({ type: "CLOSE_CART" });
@@ -96,7 +98,7 @@ export default function CartDrawer() {
                           {item.product.category}
                         </p>
                         <p className="text-sm font-semibold text-primary mt-1">
-                          ${item.product.price.toFixed(2)}
+                          {format(item.product.price)}
                         </p>
 
                         <div className="flex items-center gap-2 mt-2">
@@ -158,7 +160,7 @@ export default function CartDrawer() {
               <div className="px-6 py-4 border-t border-border space-y-3">
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Subtotal</span>
-                  <span>${totalPrice.toFixed(2)}</span>
+                  <span>{format(totalPrice)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-muted-foreground">
                   <span>Shipping</span>
@@ -167,7 +169,7 @@ export default function CartDrawer() {
                 <Separator />
                 <div className="flex justify-between font-semibold">
                   <span>Total</span>
-                  <span>${totalPrice.toFixed(2)}</span>
+                  <span>{format(totalPrice)}</span>
                 </div>
                 <Button
                   className="w-full h-12 text-base"
